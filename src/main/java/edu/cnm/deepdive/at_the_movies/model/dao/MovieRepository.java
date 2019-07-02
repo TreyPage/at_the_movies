@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.at_the_movies.dao;
+package edu.cnm.deepdive.at_the_movies.model.dao;
 
 import edu.cnm.deepdive.at_the_movies.model.entity.Movie;
 import edu.cnm.deepdive.at_the_movies.model.entity.Movie.Genre;
