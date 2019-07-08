@@ -1,9 +1,11 @@
 package edu.cnm.deepdive.at_the_movies.controller;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.cnm.deepdive.at_the_movies.model.dao.ActorRepository;
 import edu.cnm.deepdive.at_the_movies.model.dao.MovieRepository;
 import edu.cnm.deepdive.at_the_movies.model.entity.Actor;
 import edu.cnm.deepdive.at_the_movies.model.entity.Movie;
+import edu.cnm.deepdive.at_the_movies.view.FlatActor;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -40,6 +42,7 @@ public class ActorController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @JsonSerialize(contentAs = FlatActor.class)
   public List<Actor> list(@RequestParam(value = "name", required = false) String name) {
     return repository.getAllByOrderByName();
   }

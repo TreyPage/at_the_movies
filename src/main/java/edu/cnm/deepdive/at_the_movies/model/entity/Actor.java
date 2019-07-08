@@ -1,6 +1,7 @@
 package edu.cnm.deepdive.at_the_movies.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import edu.cnm.deepdive.at_the_movies.view.FlatActor;
 import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 @JsonIgnoreProperties(value = {"created", "updated",
     "href"}, allowGetters = true, ignoreUnknown = true)
-public class Actor {
+public class Actor implements FlatActor {
 
   private static EntityLinks entityLinks;
 
@@ -65,18 +66,22 @@ public class Actor {
   @OrderBy("title asc")
   private List<Movie> movies = new LinkedList<>();
 
+  @Override
   public UUID getId() {
     return id;
   }
 
+  @Override
   public Date getCreated() {
     return created;
   }
 
+  @Override
   public Date getUpdated() {
     return updated;
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -89,6 +94,7 @@ public class Actor {
     return movies;
   }
 
+  @Override
   public URI getHref() {
     return entityLinks.linkForSingleResource(Actor.class, id).toUri();
   }

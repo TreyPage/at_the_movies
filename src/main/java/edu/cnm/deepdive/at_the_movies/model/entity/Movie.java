@@ -1,16 +1,24 @@
 package edu.cnm.deepdive.at_the_movies.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import edu.cnm.deepdive.at_the_movies.view.FlatActor;
 import java.net.URI;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,6 +64,11 @@ public class Movie {
   @Enumerated(EnumType.STRING)
   private Genre genre;
 
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "movies", cascade = {CascadeType.DETACH, CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
+  @OrderBy("name ASC")
+  @JsonSerialize(contentAs = FlatActor.class)
+  private List<Actor> actors = new LinkedList<>();
+
   public UUID getId() {
     return id;
   }
@@ -90,6 +103,10 @@ public class Movie {
 
   public void setGenre(Genre genre) {
     this.genre = genre;
+  }
+
+  public List<Actor> getActors() {
+    return actors;
   }
 
   public URI getHref() {
