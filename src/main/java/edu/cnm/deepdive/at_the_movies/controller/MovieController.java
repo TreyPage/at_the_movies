@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,8 +44,14 @@ public class MovieController {
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Movie post(@RequestBody Movie movie) {
-    return repository.save(movie); // TODO Build a ResponseEntity.
+  public ResponseEntity<Movie> post(@RequestBody Movie movie) {
+    repository.save(movie);
+    return ResponseEntity.created(movie.getHref()).body(movie);
+  }
+
+  @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Movie> search(@RequestParam(value = "q",required = true) String titleish) {
+    return repository.getAllByTitleContainsOrderByTitle(titleish);
   }
 
   @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)

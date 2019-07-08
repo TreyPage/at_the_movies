@@ -8,5 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface ActorRepository extends CrudRepository<Actor, UUID> {
 
   List<Actor> getAllByOrderByName();
-  //TODO EVERYTHING!!!!
+
+  List<Actor> getAllByNameContainsOrderByName(String nameish);
 }
