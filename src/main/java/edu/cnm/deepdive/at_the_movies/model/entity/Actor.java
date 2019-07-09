@@ -1,7 +1,10 @@
 package edu.cnm.deepdive.at_the_movies.model.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.cnm.deepdive.at_the_movies.view.FlatActor;
+import edu.cnm.deepdive.at_the_movies.view.FlatMovie;
 import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
@@ -29,9 +32,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Entity
-@Component
-@JsonIgnoreProperties(value = {"created", "updated",
-    "href"}, allowGetters = true, ignoreUnknown = true)
+@Component//most base class annotation to define something as a Lego (A Spring Bean)
+@JsonIgnoreProperties(value = {"id", "created", "updated",
+    "href", "movies"}, allowGetters = true, ignoreUnknown = true)
 public class Actor implements FlatActor {
 
   private static EntityLinks entityLinks;
@@ -55,8 +58,9 @@ public class Actor implements FlatActor {
   @Column(nullable = false, updatable = false)
   private Date updated;
 
-  @NonNull
-  @Column(nullable = false, unique = true)
+  @NonNull//means that I am never going to assign a null value to this thing.
+  //JAVA nonnull means THIS SHOULD NEVER BE NULL, DOESN'T MATTER WHO ASSIGNED IT
+  @Column(length = 256, nullable = false, unique = true)
   private String name;
 
   @ManyToMany(fetch = FetchType.LAZY,
@@ -89,7 +93,7 @@ public class Actor implements FlatActor {
   public void setName(String name) {
     this.name = name;
   }
-
+@JsonSerialize(contentAs = FlatMovie.class)
   public List<Movie> getMovies() {
     return movies;
   }
@@ -102,11 +106,10 @@ public class Actor implements FlatActor {
   @PostConstruct
   private void init() {
     String ignore = entityLinks.toString();
-  }
+  }//invoking a method and assigning its result to a variable which we ignore
 
   @Autowired
   private void setEntityLinks(EntityLinks entityLinks) {
     Actor.entityLinks = entityLinks;
-  }
-
+  }//we want an instance method to set a static field
 }

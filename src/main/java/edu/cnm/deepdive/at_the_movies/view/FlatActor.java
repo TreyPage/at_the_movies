@@ -5,14 +5,13 @@ import java.util.Date;
 import java.util.UUID;
 
 public interface FlatActor {
+  UUID getId();
 
-   UUID getId();
+  Date getCreated();
 
-   Date getCreated();
+  Date getUpdated();
 
-   Date getUpdated();
+  String getName();
 
-   String getName();
-
-   URI getHref();
+  URI getHref();
 }

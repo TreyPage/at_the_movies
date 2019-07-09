@@ -1,27 +1,24 @@
 package edu.cnm.deepdive.at_the_movies.view;
 
-import edu.cnm.deepdive.at_the_movies.model.entity.Actor;
 import edu.cnm.deepdive.at_the_movies.model.entity.Movie.Genre;
 import java.net.URI;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public interface FlatMovie {
 
-   UUID getId();
+  UUID getId();
 
-   Date getCreated();
+  Date getCreated();
 
-   Date getUpdated();
+  Date getUpdated();
 
-   String getTitle();
+  String getTitle();
 
-   String getScreenwriter();
+  String getScreenwriter();
 
-   Genre getGenre();
+  Genre getGenre();
 
-   List<Actor> getActors();
+  URI getHref();
 
-   URI getHref();
 }

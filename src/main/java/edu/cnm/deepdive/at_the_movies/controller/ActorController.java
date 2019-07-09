@@ -1,8 +1,9 @@
 package edu.cnm.deepdive.at_the_movies.controller;
 
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import edu.cnm.deepdive.at_the_movies.model.dao.ActorRepository;
-import edu.cnm.deepdive.at_the_movies.model.dao.MovieRepository;
+import edu.cnm.deepdive.at_the_movies.dao.ActorRepository;
+import edu.cnm.deepdive.at_the_movies.dao.MovieRepository;
 import edu.cnm.deepdive.at_the_movies.model.entity.Actor;
 import edu.cnm.deepdive.at_the_movies.model.entity.Movie;
 import edu.cnm.deepdive.at_the_movies.view.FlatActor;
@@ -26,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+//TODO Add annotations, fields, methods, constructor to make this a REST controller,
+// listening at the relative URL "actors"
+
 @RestController
 @RequestMapping("actors")
 @ExposesResourceFor(Actor.class)
@@ -43,17 +47,17 @@ public class ActorController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @JsonSerialize(contentAs = FlatActor.class)
-  public List<Actor> list(@RequestParam(value = "name", required = false) String name) {
+  public List<Actor> list() {
     return repository.getAllByOrderByName();
   }
 
   @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Actor> search(@RequestParam(value = "q", required = true) String nameish) {
-    return repository.getAllByNameContainsOrderByName(nameish);
+  public List<Actor> search(@RequestParam(value = "q", required = true) String nameFragment) {
+    return repository
+        .getAllByNameContainsOrderByNameAsc(nameFragment); //Mitigates SQL Injection attack
   }
 
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Actor> post(@RequestBody Actor actor) {
     repository.save(actor);
     return ResponseEntity.created(actor.getHref()).body(actor);
@@ -64,8 +68,15 @@ public class ActorController {
     return repository.findById(id).get();
   }
 
+  @DeleteMapping(value = "{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable("id") UUID id) {
+    repository.delete(get(id));
+  }
+
   @PutMapping(value = "{actorId}/movies/{movieId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public Actor attach(@PathVariable("actorId") UUID actorId, @PathVariable("movieId") UUID movieId) {
+  public Actor attach(@PathVariable("actorId") UUID actorId,
+      @PathVariable("movieId") UUID movieId) {
     Actor actor = get(actorId);
     Movie movie = movieRepository.findById(movieId).get();
     if (!actor.getMovies().contains(movie)) {
@@ -75,16 +86,16 @@ public class ActorController {
   }
 
   @DeleteMapping(value = "{actorId}/movies/{movieId}")
-  @ResponseStatus(value = HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void detach(@PathVariable("actorId") UUID actorId, @PathVariable("movieId") UUID movieId) {
     Actor actor = get(actorId);
     Movie movie = movieRepository.findById(movieId).get();
-      actor.getMovies().remove(movie);
+    actor.getMovies().remove(movie);
     repository.save(actor);
   }
 
   @ResponseStatus(value = HttpStatus.NOT_FOUND)
   @ExceptionHandler(NoSuchElementException.class)
-  public void nobodiesHome() {
+  public void notHereMan() {
   }
 }
