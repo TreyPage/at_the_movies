@@ -1,6 +1,6 @@
 package edu.cnm.deepdive.at_the_movies.view;
 
-import edu.cnm.deepdive.at_the_movies.model.entity.Movie.Genre;
+import edu.cnm.deepdive.at_the_movies.model.entity.Genre;
 import java.net.URI;
 import java.util.Date;
 import java.util.UUID;

@@ -13,12 +13,12 @@ import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -64,7 +64,8 @@ public class Movie implements FlatMovie {
 
   private String screenwriter;
 
-  @Enumerated(EnumType.STRING)
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "genre_id")
   private Genre genre;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "movies", cascade = {CascadeType.DETACH,
@@ -115,14 +116,15 @@ public class Movie implements FlatMovie {
     this.genre = genre;
   }
 
+  public List<Actor> getActors() {
+    return actors;
+  }
+
   @Override
   public URI getHref() {
     return entityLinks.linkForSingleResource(Movie.class, id).toUri();
   }
 
-  public List<Actor> getActors() {
-    return actors;
-  }
 
   @PostConstruct
   private void init() {
@@ -134,9 +136,4 @@ public class Movie implements FlatMovie {
     Movie.entityLinks = entityLinks;
   }//we want an instance method to set a static field
 
-
-
-  public enum Genre {
-    ACTION, ROM_COM, HORROR, DOCUMENTARY, ANIME, SCI_FI, FANTASY
-  }
 }
