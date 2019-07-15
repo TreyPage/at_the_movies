@@ -1,10 +1,11 @@
 package edu.cnm.deepdive.at_the_movies.controller;
 
 import edu.cnm.deepdive.at_the_movies.dao.ActorRepository;
+import edu.cnm.deepdive.at_the_movies.dao.GenreRepository;
 import edu.cnm.deepdive.at_the_movies.dao.MovieRepository;
 import edu.cnm.deepdive.at_the_movies.model.entity.Actor;
-import edu.cnm.deepdive.at_the_movies.model.entity.Movie;
 import edu.cnm.deepdive.at_the_movies.model.entity.Genre;
+import edu.cnm.deepdive.at_the_movies.model.entity.Movie;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -33,20 +34,23 @@ public class MovieController {
 
   private final MovieRepository repository;
   private final ActorRepository actorRepository;
-
+  private final GenreRepository genreRepository;
 
   @Autowired
   public MovieController(MovieRepository repository,
-      ActorRepository actorRepository) {
+      ActorRepository actorRepository,
+      GenreRepository genreRepository) {
     this.repository = repository;
     this.actorRepository = actorRepository;
+    this.genreRepository = genreRepository;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Movie> list(@RequestParam(value = "genre", required = false) Genre genre) {
-    if (genre == null) {
+  public List<Movie> list(@RequestParam(value = "genre", required = false) UUID genreId) {
+    if (genreId == null) {
       return repository.getAllByOrderByTitleAsc();
     } else {
+      Genre genre = genreRepository.findById(genreId).get();
       return repository.getAllByGenreOrderByTitleAsc(genre);
     }
   }
@@ -60,8 +64,10 @@ public class MovieController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Movie> post(@RequestBody Movie movie) {
-    repository.save(movie); // When/ we post a new resource to a collection, it should come back with a 201 result code and a locastion URL specifying the url of the object we just posted.
-    return ResponseEntity.created(movie.getHref()).body(movie); //passes back movie object we got from getHref
+    repository.save(
+        movie); // When/ we post a new resource to a collection, it should come back with a 201 result code and a locastion URL specifying the url of the object we just posted.
+    return ResponseEntity.created(movie.getHref())
+        .body(movie); //passes back movie object we got from getHref
   }
 
   @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,6 +75,15 @@ public class MovieController {
     return repository.findById(id).get();
   }
   //takes a single data type signifying the Movie type, which happens to be a UUID
+
+  @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Movie put(@PathVariable("id")UUID id, @RequestBody Movie movie) {
+    Movie existingMovie = repository.findById(id).get();
+    existingMovie.setGenre(movie.getGenre());
+    existingMovie.setScreenwriter(movie.getScreenwriter());
+    existingMovie.setTitle(movie.getTitle());
+    return repository.save(existingMovie);
+  }
 
   @Transactional
   @DeleteMapping(value = "{id}")
